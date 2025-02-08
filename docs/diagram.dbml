@@ -1,0 +1,30 @@
+Table users {
+  id integer
+  username varchar
+  password varchar
+}
+
+Table user_results {
+  user_id integer
+  quiz_id integer
+  high_score numeric
+}
+
+Table quiz_topics {
+  topic_id integer
+  title varchar
+}
+
+Table quiz {
+  topic_id integer
+  quiz_id integer
+  question varchar
+  answer varchar
+}
+
+
+
+
+Ref: users.id > user_results.user_id
+Ref: quiz.quiz_id > user_results.quiz_id
+Ref: quiz_topics.topic_id > quiz.topic_id
