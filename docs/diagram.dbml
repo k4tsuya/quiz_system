@@ -19,12 +19,18 @@ Table quiz {
   topic_id integer
   quiz_id integer
   question varchar
-  answer varchar
 }
 
+Table quiz_answers {
+  quiz_id integer
+  answer varchar
+  answer_correct boolean
+}
 
 
 
 Ref: users.id > user_results.user_id
 Ref: quiz.quiz_id > user_results.quiz_id
+Ref: quiz.quiz_id > quiz_answers.quiz_id
+
 Ref: quiz_topics.topic_id > quiz.topic_id
