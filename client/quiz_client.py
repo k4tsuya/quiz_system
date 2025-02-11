@@ -1,20 +1,18 @@
 """Quiz Client."""
 
-from sql_client import PostgresqlClient
+import psycopg2
+import psycopg2.errorcodes
+
+from .sql_client import PostgresqlClient
 
 
 class QuizClient(PostgresqlClient):
     """Quiz Client class with methods to interact with the quiz database."""
 
-    def __init__(self, host: str, port: int, user: str, password: str) -> None:
-        """Initialize the client with database connection details."""
-        super().__init__(host, port, user, password)
-        self.table_name = "quiz"
+    def __init__(self, config: dict, database: str) -> None:
+        """Initialize the quiz client."""
+        super().__init__(config, database)
         self.difficulty_level = 0
-
-    def initialize_quiz_data(self) -> dict:
-        """Initialize quiz data from db."""
-        # TODO: Implement initialization logic from db
 
     # Quiz
     def get_quiz_data(self, quiz_id: int) -> dict:
@@ -25,17 +23,12 @@ class QuizClient(PostgresqlClient):
         """Get random question from db."""
         # TODO: Implement logic to get random questions from db
 
-    def get_correct_answer(self, quiz_id: int) -> str:
-        """Get correct answer from db."""
-        # TODO: Implement logic to get correct answer from db
-
     def set_difficulty_level(
         self,
-        quiz_id: int,
         difficulty_level: int,
     ) -> None:
         """Set difficulty level of quiz."""
-        # TODO: Implement logic to set difficulty level of quiz
+        self.difficulty_level = difficulty_level
 
     # Questions
     def add_question(
@@ -55,6 +48,7 @@ class QuizClient(PostgresqlClient):
         """Add answers to db."""
         # TODO: Implement logic to add answers to db
 
+    # OPTIONAL
     def update_question(
         self,
         quiz_id: int,
@@ -68,14 +62,38 @@ class QuizClient(PostgresqlClient):
         """Delete question from db."""
         # TODO: Implement logic to delete question from db
 
-    def add_topic(
-        self,
-        topic_name: str,
-    ) -> None:
+    def add_topic(self, name: str) -> None:
         """Add topic to db."""
-        # TODO: Implement logic to add topic to db
+        try:
+            self.messenger.execute(
+                """
+                INSERT INTO quiz_topic (name)
+                VALUES (%s);
+                COMMIT;
+                """,
+                (name,),
+            )
+            print(f"Added topic: {name}")
+        except ValueError as e:
+            print(f"Error adding topic: {e}")
+
+    def list_topics(self) -> list[str]:
+        """List all topics in db."""
+        self.messenger.execute("SELECT name FROM quiz_topic;")
+        return [row[0] for row in self.messenger.fetchall()]
 
     # System
+    def purge_quiz_database(self) -> None:
+        """Purge quiz database."""
+        try:
+            self.insert_modify_data("""
+                DROP SCHEMA public cascade;
+                CREATE SCHEMA public;
+            """)
+        except psycopg2.errors.OperationalError as e:
+            print(f"Error purging quiz database: {e}")
+        else:
+            print("Quiz database purged successfully.")
+
     def close_quiz_system(self) -> None:
         """Close quiz system."""
-        # TODO: Implement logic to close quiz system

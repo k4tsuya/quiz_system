@@ -1,6 +1,7 @@
 """PostgreSQL client."""
 
 from dataclasses import dataclass
+from pathlib import Path
 from typing import Self
 
 import psycopg2
@@ -66,7 +67,7 @@ class PostgresqlClient:
             )
             self.messenger = self.db_connection.cursor()
 
-            print("Connected to the PostgreSQL database.")
+            print("Connected to the Quiz System database.")
         except psycopg2.OperationalError as e:
             print(f"Error: {e}")
 
@@ -86,18 +87,30 @@ class PostgresqlClient:
         column_names = [x.name for x in self.messenger.description]
         return [dict(zip(column_names, row)) for row in result]
 
-    def insert_data(self, query: str) -> None:
-        """Insert data into the specified table."""
+    def insert_modify_data(self, query: str) -> None:
+        """Insert or modify data into the specified table."""
         try:
             self.messenger.execute(query)
             self.db_connection.commit()
         except psycopg2.errors.UndefinedTable as error:
             print(str(error))
         else:
-            print("Data inserted successfully.")
+            print("Database modified successfully.")
+
+    def initialize_database_structure(self) -> dict:
+        """Initialize quiz database structure."""
+        with Path.open(
+            "./sql_scripts/init_script.sql",
+            "r",
+        ) as file:
+            sql_script = file.read()
+            self.messenger.execute(sql_script)
+            self.db_connection.commit()
+        print("Database structure initialized successfully.")
 
     def close_connection(self) -> None:
         """Close the database connection."""
         if self.db_connection:
             self.messenger.close()
             self.db_connection.close()
+            print("Database connection closed.")
