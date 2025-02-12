@@ -15,9 +15,10 @@ class QuizClient(PostgresqlClient):
         self.difficulty_level = 0
 
     # Quiz
-    def get_quiz_data(self, quiz_id: int) -> dict:
+    def get_available_questions(self) -> list:
         """Get quiz data from db."""
-        # TODO: Implement logic to get quiz data from db
+        self.messenger.execute("SELECT question FROM questions;")
+        return [row[0] for row in self.messenger.fetchall()]
 
     def get_random_questions(self, quiz_id: int) -> dict:
         """Get random question from db."""
@@ -33,11 +34,20 @@ class QuizClient(PostgresqlClient):
     # Questions
     def add_question(
         self,
-        quiz_id: int,
+        topic: str,
         question: str,
     ) -> None:
         """Add question to db."""
-        # TODO: Implement logic to add question to db
+        try:
+            self.messenger.execute(
+                """INSERT INTO questions (topic, question)
+            VALUES (%s, %s);
+            COMMIT;
+            """,
+                (topic, question),
+            )
+        except psycopg2.OperationalError as e:
+            print(f"Error adding question: {e}")
 
     def add_answers(
         self,
@@ -58,9 +68,20 @@ class QuizClient(PostgresqlClient):
         """Update question in db."""
         # TODO: Implement logic to update question in db
 
-    def delete_question(self, quiz_id: int) -> None:
+    def delete_question(self, question_id: int) -> None:
         """Delete question from db."""
-        # TODO: Implement logic to delete question from db
+        try:
+            self.messenger.execute(
+                """
+                DELETE FROM questions WHERE question_id = %s;
+                """,
+                (question_id,),
+            )
+            print(
+                f"Successfully deleted question with id: {question_id}",
+            )
+        except psycopg2.OperationalError as e:
+            print(f"Error deleting question: {e}")
 
     def add_topic(self, name: str) -> None:
         """Add topic to db."""

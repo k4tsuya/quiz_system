@@ -3,15 +3,16 @@ CREATE TABLE IF NOT EXISTS quiz_topic (
     name VARCHAR(100) NOT NULL UNIQUE
 );
 
-CREATE TABLE IF NOT EXISTS quiz (
-    quiz_id  SERIAL PRIMARY KEY,
-    module VARCHAR(100) NOT NULL,
-    submodule VARCHAR(100) NOT NULL
+
+CREATE TABLE IF NOT EXISTS questions (
+    question_id SERIAL PRIMARY KEY,
+    topic TEXT REFERENCES quiz_topic (name),
+    question TEXT NOT NULL
 );
 
-CREATE TABLE IF NOT EXISTS quiz_answers (
-    answer_id INTEGER REFERENCES quiz (quiz_id),
-    question TEXT NOT NULL,
+CREATE TABLE IF NOT EXISTS answers (
+    answer_id INTEGER PRIMARY KEY,
+    question_id INTEGER REFERENCES questions (question_id),
     answer TEXT NOT NULL,
     correct BOOLEAN NOT NULL
 );

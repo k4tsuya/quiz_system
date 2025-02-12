@@ -19,7 +19,15 @@ client.connect_to_db()
 # client.purge_quiz_database()
 # client.initialize_database_structure()
 # client.add_topic("Python")
-client.add_topic("PostgreSQL")
+# client.add_topic("PostgreSQL")
 
-print(client.list_topics())
+# print(client.list_topics())
+
+# client.add_question(
+#     "Python",
+#     "How do you call a function in Python?",
+# )
+client.delete_question(1)
+print(client.get_available_questions())
+
 client.close_connection()
