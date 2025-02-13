@@ -6,11 +6,12 @@ CREATE TABLE IF NOT EXISTS quiz_topic (
 
 CREATE TABLE IF NOT EXISTS quiz_questions (
     question_id SERIAL PRIMARY KEY,
-    topic TEXT REFERENCES quiz_topic (name),
+    topic_name TEXT REFERENCES quiz_topic (name),
     question TEXT NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS quiz_answers (
+    answer_id SERIAL PRIMARY KEY,
     question_id INTEGER REFERENCES quiz_questions (question_id),
     answer TEXT NOT NULL,
     correct BOOLEAN NOT NULL
