@@ -1,5 +1,7 @@
 """Quiz Client."""
 
+from enum import Enum
+
 import psycopg2
 import psycopg2.errorcodes
 
@@ -17,12 +19,52 @@ class QuizClient(PostgresqlClient):
     # Quiz
     def get_available_questions(self) -> list:
         """Get quiz data from db."""
-        self.messenger.execute("SELECT question FROM questions;")
-        return [row[0] for row in self.messenger.fetchall()]
+        self.messenger.execute(
+            "SELECT question_id, question FROM quiz_questions;",
+        )
+        question = [x.name for x in self.messenger.description]
+        return [dict(zip(question, row)) for row in self.messenger.fetchall()]
 
-    def get_random_questions(self, quiz_id: int) -> dict:
+    def get_quiz_answers(self) -> list:
+        """Get quiz answers from db."""
+        self.messenger.execute(
+            "SELECT question_id, answer, correct FROM quiz_answers;",
+        )
+        question = [x.name for x in self.messenger.description]
+        return [dict(zip(question, row)) for row in self.messenger.fetchall()]
+
+    def get_random_questions(self, question_id: int) -> dict:
         """Get random question from db."""
         # TODO: Implement logic to get random questions from db
+
+    def get_random_answers(
+        self,
+        question_id: int,
+        difficulty_level: int,
+    ) -> dict:
+        """Get random answers from db."""
+        answer_count = (
+            3 if difficulty_level == 1 else 4 if difficulty_level == 2 else 5,
+        )
+
+        try:
+            if difficulty_level >= 1 and difficulty_level <= 3:
+                self.messenger.execute(
+                    """
+                    SELECT question_id, answer FROM quiz_answers
+                    WHERE question_id = %s ORDER BY RANDOM() LIMIT %s;
+                    """,
+                    (question_id, answer_count),
+                )
+                question = [x.name for x in self.messenger.description]
+                return [
+                    dict(zip(question, row))
+                    for row in self.messenger.fetchall()
+                ]
+            msg = "Difficulty level must be 1, 2 or 3."
+            raise ValueError(msg)
+        except psycopg2.OperationalError as e:
+            print(f"An error occurred: {e}")
 
     def set_difficulty_level(
         self,
@@ -40,30 +82,44 @@ class QuizClient(PostgresqlClient):
         """Add question to db."""
         try:
             self.messenger.execute(
-                """INSERT INTO questions (topic, question)
-            VALUES (%s, %s);
-            COMMIT;
-            """,
+                """
+                INSERT INTO quiz_questions (topic, question)
+                    VALUES (%s, %s);
+                    COMMIT;
+                    """,
                 (topic, question),
             )
+            print("Question added successfully.")
         except psycopg2.OperationalError as e:
             print(f"Error adding question: {e}")
 
     def add_answers(
         self,
-        quiz_id: int,
-        answers: str,
-        correct_answer: str,
+        question_id: int,
+        answer: str,
+        correct: bool,
     ) -> None:
         """Add answers to db."""
-        # TODO: Implement logic to add answers to db
+        # TODO: Enumerate correct answers as bools
+
+        try:
+            self.messenger.execute(
+                """INSERT INTO quiz_answers (
+                    question_id, answer, correct)
+                    VALUES (%s, %s, %s);
+                    COMMIT;
+                    """,
+                (question_id, answer, correct),
+            )
+            print("Answer added successfully.")
+        except psycopg2.OperationalError as e:
+            print(f"Error adding question: {e}")
 
     # OPTIONAL
     def update_question(
         self,
         quiz_id: int,
         question: str,
-        correct_answer: str,
     ) -> None:
         """Update question in db."""
         # TODO: Implement logic to update question in db
@@ -72,8 +128,7 @@ class QuizClient(PostgresqlClient):
         """Delete question from db."""
         try:
             self.messenger.execute(
-                """
-                DELETE FROM questions WHERE question_id = %s;
+                """DELETE FROM quiz_questions WHERE question_id = %s;
                 """,
                 (question_id,),
             )
@@ -87,11 +142,10 @@ class QuizClient(PostgresqlClient):
         """Add topic to db."""
         try:
             self.messenger.execute(
-                """
-                INSERT INTO quiz_topic (name)
-                VALUES (%s);
-                COMMIT;
-                """,
+                """INSERT INTO quiz_topic (name)
+                    VALUES (%s);
+                    COMMIT;
+                    """,
                 (name,),
             )
             print(f"Added topic: {name}")
@@ -107,7 +161,7 @@ class QuizClient(PostgresqlClient):
     def purge_quiz_database(self) -> None:
         """Purge quiz database."""
         try:
-            self.insert_modify_data("""
+            self.messenger.execute("""
                 DROP SCHEMA public cascade;
                 CREATE SCHEMA public;
             """)

@@ -4,15 +4,14 @@ CREATE TABLE IF NOT EXISTS quiz_topic (
 );
 
 
-CREATE TABLE IF NOT EXISTS questions (
+CREATE TABLE IF NOT EXISTS quiz_questions (
     question_id SERIAL PRIMARY KEY,
     topic TEXT REFERENCES quiz_topic (name),
     question TEXT NOT NULL
 );
 
-CREATE TABLE IF NOT EXISTS answers (
-    answer_id INTEGER PRIMARY KEY,
-    question_id INTEGER REFERENCES questions (question_id),
+CREATE TABLE IF NOT EXISTS quiz_answers (
+    question_id INTEGER REFERENCES quiz_questions (question_id),
     answer TEXT NOT NULL,
     correct BOOLEAN NOT NULL
 );
