@@ -1,11 +1,26 @@
 """Quiz Client."""
 
-from enum import Enum
+from enum import Enum, IntEnum
 
 import psycopg2
 import psycopg2.errorcodes
 
 from .sql_client import PostgresqlClient
+
+
+class TrueFalseBoolean(Enum):
+    """Enum for correct answers."""
+
+    CORRECT = True
+    INCORRECT = False
+
+
+class DifficultyLevel(IntEnum):
+    """Enum for difficulty levels."""
+
+    EASY = 1
+    MEDIUM = 2
+    HARD = 3
 
 
 class QuizClient(PostgresqlClient):
@@ -14,7 +29,6 @@ class QuizClient(PostgresqlClient):
     def __init__(self, config: dict, database: str) -> None:
         """Initialize the quiz client."""
         super().__init__(config, database)
-        self.difficulty_level = 0
 
     # Quiz
     def get_available_questions(self) -> list:
@@ -57,18 +71,24 @@ class QuizClient(PostgresqlClient):
     def get_random_answers(
         self,
         question_id: int,
+        difficulty_level: DifficultyLevel,
     ) -> list:
         """Get random answers from db."""
         answer_count = (
             3
-            if self.difficulty_level == 1
+            if (difficulty_level == DifficultyLevel.EASY)
             else 4
-            if self.difficulty_level == 2
-            else 5,
+            if (difficulty_level == DifficultyLevel.MEDIUM)
+            else 5
+            if (difficulty_level == DifficultyLevel.HARD)
+            else None,
         )
 
         try:
-            if self.difficulty_level >= 1 and self.difficulty_level <= 3:
+            if (
+                difficulty_level >= DifficultyLevel.EASY
+                and difficulty_level <= DifficultyLevel.HARD
+            ):
                 self.messenger.execute(
                     """
                     SELECT question_id, answer FROM quiz_answers
@@ -117,11 +137,9 @@ class QuizClient(PostgresqlClient):
         self,
         question_id: int,
         answer: str,
-        correct: bool,
+        correct: TrueFalseBoolean,
     ) -> None:
         """Add answers to db."""
-        # TODO: Enumerate correct answers as bools
-
         try:
             self.messenger.execute(
                 """INSERT INTO quiz_answers (

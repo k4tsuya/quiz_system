@@ -1,9 +1,7 @@
 """Main.py for the quiz_system project."""
 
-import PySide6.QtCore
-
-
 from client import QuizClient
+from client.quiz_client import DifficultyLevel
 
 config_data: dict = {
     "host": "localhost",
@@ -47,15 +45,15 @@ client.connect_to_db()
 # client.add_answers(2, "List is immutable and tuple is mutable.", False)
 
 
-# print("\n")
-# # print(client.get_random_answers(1, 3))
+print("\n")
+print(client.get_random_answers(1, 1))
 # print(client.get_random_questions("Python"))
-# print("\n")
+print("\n")
 
-client.update_question(1, "How to call a function in Python?")
+# client.update_question(1, "How to call a function in Python?")
 
-print(client.get_available_questions())
-print(client.get_quiz_answers())
+# print(client.get_available_questions())
+# print(client.get_quiz_answers())
 # client.delete_question(1)
 
 client.close_connection()
