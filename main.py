@@ -1,7 +1,7 @@
 """Main.py for the quiz_system project."""
 
-from client import QuizClient
-from client.quiz_client import DifficultyLevel
+from server_client.quiz_client import DifficultyLevel
+from terminal_client import TerminalClient
 
 config_data: dict = {
     "host": "localhost",
@@ -13,10 +13,16 @@ config_data: dict = {
 
 table_name: str = "quiz"
 
-client = QuizClient(config_data, table_name)
+# client = QuizClient(config_data, table_name)
+client = TerminalClient(config_data, table_name)
 
 
 client.connect_to_db()
+client.run()
+
+client.close_connection()
+
+
 # client.purge_quiz_database()
 # client.initialize_database_structure()
 # client.add_topic("Python")
@@ -45,15 +51,13 @@ client.connect_to_db()
 # client.add_answers(2, "List is immutable and tuple is mutable.", False)
 
 
-print("\n")
-print(client.get_random_answers(1, 1))
+# print("\n")
+# print(client.get_random_answers(1, 1))
 # print(client.get_random_questions("Python"))
-print("\n")
+# print("\n")
 
 # client.update_question(1, "How to call a function in Python?")
 
 # print(client.get_available_questions())
 # print(client.get_quiz_answers())
 # client.delete_question(1)
-
-client.close_connection()

@@ -198,7 +198,7 @@ class QuizClient(PostgresqlClient):
         except ValueError as e:
             print(f"Error adding topic: {e}")
 
-    def list_topics(self) -> list[str]:
+    def get_topics(self) -> list[str]:
         """List all topics in db."""
         self.messenger.execute("SELECT name FROM quiz_topic;")
         return [row[0] for row in self.messenger.fetchall()]
@@ -215,6 +215,3 @@ class QuizClient(PostgresqlClient):
             print(f"Error purging quiz database: {e}")
         else:
             print("Quiz database purged successfully.")
-
-    def close_quiz_system(self) -> None:
-        """Close quiz system."""

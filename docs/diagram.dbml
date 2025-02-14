@@ -11,25 +11,26 @@ Table user_results {
 }
 
 Table quiz_topic {
-  topic_id integer
-  name varchar
+  topic_id integer [pk]
+  name varchar [unique]
 }
 
-Table quiz {
-  topic_id integer
-  quiz_id integer
-  question varchar
+Table quiz_questions {
+  question_id integer [pk]
+  topic_name text
+  question text
 }
 
 Table quiz_answers {
-  quiz_id integer
-  answer varchar
-  correct boolean
+  answer_id integer [pk]
+  question_id integer
+  answer text
+  correct bool
 }
 
 
 
 Ref: users.id > user_results.user_id
-Ref: quiz.quiz_id > user_results.quiz_id
-Ref: quiz.quiz_id > quiz_answers.quiz_id
-Ref: quiz_topic.topic_id > quiz.topic_id
+Ref: quiz_questions.topic_name > quiz_questions.topic_name
+Ref: quiz_answers.question_id > quiz_questions.question_id
+Ref: quiz_topic.name > quiz_questions.topic_name
