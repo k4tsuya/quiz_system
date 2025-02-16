@@ -91,7 +91,8 @@ class QuizClient(PostgresqlClient):
             ):
                 self.messenger.execute(
                     """
-                    SELECT question_id, answer FROM quiz_answers
+                    SELECT question_id, answer_id, answer, correct
+                    FROM quiz_answers
                     WHERE question_id = %s ORDER BY RANDOM() LIMIT %s;
                     """,
                     (question_id, answer_count),

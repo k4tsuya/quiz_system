@@ -18,7 +18,7 @@ client = TerminalClient(config_data, table_name)
 
 
 client.connect_to_db()
-client.run()
+client.run_quiz()
 
 client.close_connection()
 
