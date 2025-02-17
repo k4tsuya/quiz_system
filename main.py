@@ -1,6 +1,5 @@
 """Main.py for the quiz_system project."""
 
-from server_client.quiz_client import DifficultyLevel
 from terminal_client import TerminalClient
 
 config_data: dict = {

@@ -1,6 +1,5 @@
 """Terminal for the quiz application."""
 
-import enum
 import os
 import subprocess
 
@@ -27,11 +26,11 @@ class TerminalClient(QuizClient):
     def run_quiz(self) -> None:
         """Run the Terminal Quiz Application."""
         commands: dict = {
+            "0": exit,
             "1": self.start_quiz,
             "2": self.get_set_topic,
             "3": self.set_difficulty_level,
-            "4": exit,
-            # "4": self.add_new_topic,
+            "4": self.add_new_topic,
             # "5": self.add_new_question,
             # "6": self.update_existing_question,
             # "7": self.delete_question,
@@ -45,14 +44,14 @@ class TerminalClient(QuizClient):
             print("1. Start a new quiz")
             print("2. View and set quiz topic.")
             print("3. Set difficulty level.")
-            print("4. Exit\n")
+            print("4. Add new topic")
+            print("0. Exit\n")
             choice: str = input("Enter your choice: ")
 
             commands[choice]()
 
     def start_quiz(self) -> None:
         """Start a new quiz with the selected difficulty level."""
-        # Implement the logic to start a new quiz
         self.clear_terminal()
         questions: list = self.get_random_questions(
             self.topic,
@@ -107,7 +106,7 @@ class TerminalClient(QuizClient):
 
         while set_topic:
             self.topic = input(
-                "\nEnter the topic name to select: ",
+                "\nEnter the topic name (case sensitive) to select: ",
             )
 
             if self.topic not in list(self.get_topics()):
@@ -143,5 +142,21 @@ class TerminalClient(QuizClient):
                 select_difficulty: bool = False
 
         print("Difficulty level set to:", self.difficulty_level)
+        input("Press Enter to continue...")
+        self.clear_terminal()
+
+    def add_new_topic(self) -> None:
+        """Add a new topic to the quiz."""
+        self.clear_terminal()
+        adding_topic: bool = True
+        while adding_topic:
+            print("Adding topic:")
+            print("Leave topic blank to exit.\n")
+            topic_name = input("Enter the name of the topic: ")
+            if not topic_name:
+                adding_topic = False
+            else:
+                self.add_topic(topic_name)
+                adding_topic = False
         input("Press Enter to continue...")
         self.clear_terminal()

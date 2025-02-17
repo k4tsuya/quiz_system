@@ -196,7 +196,9 @@ class QuizClient(PostgresqlClient):
                 (name,),
             )
             print(f"Added topic: {name}")
-        except ValueError as e:
+        except psycopg2.errors.UniqueViolation as e:
+            print(f"Topic {name} already exists.")
+        except psycopg2.OperationalError as e:
             print(f"Error adding topic: {e}")
 
     def get_topics(self) -> list[str]:
