@@ -1,15 +1,3 @@
-Table users {
-  id integer
-  username varchar
-  password varchar
-}
-
-Table user_results {
-  user_id integer
-  quiz_id integer
-  high_score numeric
-}
-
 Table quiz_topic {
   topic_id integer [pk]
   name varchar [unique]
@@ -30,7 +18,5 @@ Table quiz_answers {
 
 
 
-Ref: users.id > user_results.user_id
-Ref: quiz_questions.topic_name > quiz_questions.topic_name
-Ref: quiz_answers.question_id > quiz_questions.question_id
+Ref: quiz_questions.question_id > quiz_answers.question_id
 Ref: quiz_topic.name > quiz_questions.topic_name

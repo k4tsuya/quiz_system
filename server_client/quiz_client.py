@@ -1,6 +1,7 @@
 """Quiz Client."""
 
 from enum import Enum, IntEnum
+from pathlib import Path
 
 import psycopg2
 import psycopg2.errorcodes
@@ -171,13 +172,15 @@ class QuizClient(PostgresqlClient):
         except psycopg2.OperationalError as e:
             print(f"Error updating question: {e}")
 
-    def delete_question(self, question_id: int) -> None:
+    def delete_question_from_db(self, question_id: int) -> None:
         """Delete question from db."""
         try:
             self.messenger.execute(
                 """DELETE FROM quiz_questions WHERE question_id = %s;
+                DELETE FROM quiz_answers WHERE question_id = %s;
+                COMMIT;
                 """,
-                (question_id,),
+                (question_id, question_id),
             )
             print(
                 f"Successfully deleted question with id: {question_id}",
@@ -207,6 +210,17 @@ class QuizClient(PostgresqlClient):
         return [row[0] for row in self.messenger.fetchall()]
 
     # System
+    def load_sample_data(self) -> dict:
+        """Load sample data into db."""
+        with Path.open(
+            "./sql_scripts/sample_questions.sql",
+            "r",
+        ) as file:
+            sql_script = file.read()
+            self.messenger.execute(sql_script)
+            self.db_connection.commit()
+        print("Database sample data loaded successfully.")
+
     def purge_quiz_database(self) -> None:
         """Purge quiz database."""
         try:

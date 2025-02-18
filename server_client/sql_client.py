@@ -71,32 +71,6 @@ class PostgresqlClient:
         except psycopg2.OperationalError as e:
             print(f"Error: {e}")
 
-    # def fetch_data(self, query: str) -> list:
-    #     """Fetch data from the specified SQL query."""
-    #     try:
-    #         self.messenger.execute(query)
-    #     except psycopg2.errors.UndefinedTable as error:
-    #         print(str(error))
-    #     else:
-    #         items: list = self.messenger.fetchall()
-    #         refined_result = self.refine_results(items)
-    #         print(refined_result)
-
-    # def refine_results(self, result: list) -> list:
-    #     """Refine the results to be a list of dictionaries."""
-    #     column_names = [x.name for x in self.messenger.description]
-    #     return [dict(zip(column_names, row)) for row in result]
-
-    # def insert_modify_data(self, query: str) -> None:
-    #     """Insert or modify data into the specified table."""
-    #     try:
-    #         self.messenger.execute(query)
-    #         self.db_connection.commit()
-    #     except psycopg2.errors.UndefinedTable as error:
-    #         print(str(error))
-    #     else:
-    #         print("Database modified successfully.")
-
     def initialize_database_structure(self) -> dict:
         """Initialize quiz database structure."""
         with Path.open(

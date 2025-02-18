@@ -15,7 +15,9 @@ class TerminalClient(QuizClient):
         super().__init__(config, database)
         self.difficulty: int = DifficultyLevel.EASY  # Default difficulty level
         self.topic: str = "Python"  # Default topic name
-        self.question_amount: int = 5  # Default number of questions
+        self.question_amount: int = (
+            5  # Default number of questions if available
+        )
         self.score: int = 0
 
     def clear_terminal(self) -> None:
@@ -33,8 +35,7 @@ class TerminalClient(QuizClient):
             "4": self.add_new_topic,
             "5": self.add_new_question,
             "6": self.add_answers_to_question,
-            # "7": self.update_existing_question,
-            # "8": self.delete_question,
+            "7": self.delete_question,
         }
 
         self.clear_terminal()
@@ -48,6 +49,7 @@ class TerminalClient(QuizClient):
             print("4. Add new topic")
             print("5. Add new question")
             print("6. Add answers to a question")
+            print("7. Delete a question")
             print("0. Exit\n")
             choice: str = input("Enter your choice: ")
 
@@ -244,3 +246,42 @@ class TerminalClient(QuizClient):
         print("Available Questions:\n")
         for index, question in enumerate(available_questions):
             print(f"{index + 1}. {question['question']}")
+
+    def delete_question(self) -> None:
+        """Delete a question."""
+        self.clear_terminal()
+        deleting_question: bool = True
+
+        sub_command = {
+            "1": self.list_all_questions,
+            "2": self.delete_question_from_db,
+            "3": exit,
+        }
+
+        print("Deleting question and its answers:")
+        print("-------------------\n")
+        print("1. List all questions")
+        print("2. Delete question with its id.")
+        print("3. Exit\n")
+        option: str = input("Please select an option: ")
+        sub_command[option]()
+
+        print("--------------------\n")
+
+        while deleting_question:
+            question_id: int = input(
+                "Enter the id of the question you want to delete: ",
+            )
+            if question_id:
+                confirmation = input(
+                    "Are you sure you want to delete this question? (y/n): ",
+                )
+                if confirmation.lower() == "y":
+                    self.delete_question_from_db(question_id)
+                    print(f"Question with id {question_id} has been deleted.")
+                    input("Press Enter to continue...")
+                    deleting_question = False
+                else:
+                    print("\nNo question id provided.")
+                    input("Press Enter to continue...")
+                    deleting_question = False
