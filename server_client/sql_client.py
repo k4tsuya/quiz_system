@@ -67,7 +67,6 @@ class PostgresqlClient:
             )
             self.messenger = self.db_connection.cursor()
 
-            print("Connected to the Quiz System database.")
         except psycopg2.OperationalError as e:
             print(f"Error: {e}")
 
@@ -87,4 +86,3 @@ class PostgresqlClient:
         if self.db_connection:
             self.messenger.close()
             self.db_connection.close()
-            print("Database connection closed.")

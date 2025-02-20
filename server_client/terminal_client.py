@@ -19,13 +19,14 @@ class TerminalClient(QuizClient):
             5  # Default number of questions if available
         )
         self.score: int = 0
+        self.run_quiz_system()
 
     def clear_terminal(self) -> None:
         """Clear the terminal screen."""
         cmd = "cls" if os.name == "nt" else "clear"
         subprocess.run(cmd, shell=False, check=True)
 
-    def run_quiz(self) -> None:
+    def run_quiz_system(self) -> None:
         """Run the Terminal Quiz Application."""
         commands: dict = {
             "0": exit,
@@ -58,6 +59,7 @@ class TerminalClient(QuizClient):
     def start_quiz(self) -> None:
         """Start a new quiz with the selected difficulty level."""
         self.clear_terminal()
+        self.connect_to_db()
         questions: list = self.get_random_questions(
             self.topic,
             self.question_amount,
@@ -79,9 +81,9 @@ class TerminalClient(QuizClient):
                 answer_values.append(answer["correct"])
                 print(f"{index + 1}. {answer['answer']}")
 
-            print("\nEnter your answer by entering the number: ")
+            print("0. None of the above.\n")
             selected_answer: int = int(
-                input("If the correct answer is not in the list enter 0: "),
+                input("\nEnter your answer by entering the number: "),
             )
 
             if answer_values[selected_answer - 1] is True:
@@ -105,10 +107,12 @@ class TerminalClient(QuizClient):
             print("\nNo questions available for this quiz.")
             input("Press Enter to exit...")
             self.clear_terminal()
+        self.close_connection()
 
     def get_set_topic(self) -> None:
         """Set the topic for the quiz."""
         self.clear_terminal()
+        self.connect_to_db()
         set_topic: bool = True
         print("Quiz Topics:\n")
         for item in self.get_topics():
@@ -127,6 +131,7 @@ class TerminalClient(QuizClient):
 
         input("Press Enter to start continue...")
         self.clear_terminal()
+        self.close_connection()
 
     def set_difficulty_level(self) -> int:
         """Set the difficulty level for the quiz."""
@@ -158,6 +163,7 @@ class TerminalClient(QuizClient):
     def add_new_topic(self) -> None:
         """Add a new topic to the quiz."""
         self.clear_terminal()
+        self.connect_to_db()
         adding_topic: bool = True
         while adding_topic:
             print("Adding topic:")
@@ -170,10 +176,12 @@ class TerminalClient(QuizClient):
                 adding_topic = False
         input("Press Enter to continue...")
         self.clear_terminal()
+        self.close_connection()
 
     def add_new_question(self) -> None:
         """Add a new question to the quiz."""
         self.clear_terminal()
+        self.connect_to_db()
         print("Adding question: ")
         print("---------------------")
         topics = self.get_topics()
@@ -202,10 +210,12 @@ class TerminalClient(QuizClient):
                     print("\nPress Enter to continue...")
                     self.clear_terminal()
                     adding_question = False
+        self.close_connection()
 
     def add_answers_to_question(self) -> None:
         """Add answers to a specific question."""
         self.clear_terminal()
+        self.connect_to_db()
         adding_answer: bool = True
 
         sub_command = {
@@ -238,17 +248,21 @@ class TerminalClient(QuizClient):
         print("\nAnswer added successfully.")
         input("Press Enter to continue...")
         self.clear_terminal()
+        self.close_connection()
 
     def list_all_questions(self) -> None:
         """List all questions and its id."""
         self.clear_terminal()
+        self.connect_to_db()
         available_questions = self.get_available_questions()
         print("Available Questions:\n")
         for index, question in enumerate(available_questions):
             print(f"{index + 1}. {question['question']}")
+        self.close_connection()
 
     def delete_question(self) -> None:
         """Delete a question."""
+        self.connect_to_db()
         self.clear_terminal()
         deleting_question: bool = True
 
@@ -285,3 +299,13 @@ class TerminalClient(QuizClient):
                     print("\nNo question id provided.")
                     input("Press Enter to continue...")
                     deleting_question = False
+        self.close_connection()
+
+    def reset_quiz_db(self) -> str:
+        """Reset the quiz database."""
+        self.connect_to_db()
+        self.purge_quiz_database()
+        self.initialize_database_structure()
+        self.load_sample_data()
+        self.close_connection()
+        return "Quiz database has been reset."

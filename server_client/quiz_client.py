@@ -53,7 +53,14 @@ class QuizClient(PostgresqlClient):
         topic_name: str,
         question_amount: int,
     ) -> list:
-        """Get random question from db."""
+        """
+        Get random question from db.
+
+        Args:
+            topic_name (str): The name of the topic.
+            question_amount (int): The number of questions to retrieve.
+
+        """
         self.messenger.execute(
             """
             SELECT question_id, question FROM quiz_questions
@@ -74,7 +81,15 @@ class QuizClient(PostgresqlClient):
         question_id: int,
         difficulty_level: DifficultyLevel,
     ) -> list:
-        """Get random answers from db."""
+        """
+        Get random answers from db.
+
+        Args:
+            question_id (int): The id of the question.
+            difficulty_level (DifficultyLevel):
+                The amount of answers to retrieve based on the level.
+
+        """
         answer_count = (
             3
             if (difficulty_level == DifficultyLevel.EASY)
@@ -121,7 +136,14 @@ class QuizClient(PostgresqlClient):
         topic_name: str,
         question: str,
     ) -> None:
-        """Add question to db."""
+        """
+        Add question to db.
+
+        Args:
+            topic_name (str): Topic name of the question.
+            question (str): Question text.
+
+        """
         try:
             self.messenger.execute(
                 """
@@ -141,7 +163,15 @@ class QuizClient(PostgresqlClient):
         answer: str,
         correct: TrueFalseBoolean,
     ) -> None:
-        """Add answers to db."""
+        """
+        Add answers to db.
+
+        Args:
+            question_id (int): Question id.
+            answer (str): Answer text.
+            correct (TrueFalseBoolean): True if correct, False otherwise.
+
+        """
         try:
             self.messenger.execute(
                 """INSERT INTO quiz_answers (
@@ -160,7 +190,14 @@ class QuizClient(PostgresqlClient):
         question_id: int,
         question: str,
     ) -> None:
-        """Update question in db."""
+        """
+        Update question in db.
+
+        Args:
+            question_id (int): Question id.
+            question (str): New question text.
+
+        """
         try:
             self.messenger.execute(
                 """UPDATE quiz_questions SET question = %s
@@ -173,7 +210,13 @@ class QuizClient(PostgresqlClient):
             print(f"Error updating question: {e}")
 
     def delete_question_from_db(self, question_id: int) -> None:
-        """Delete question from db."""
+        """
+        Delete question from db.
+
+        Args:
+            question_id (int): Deletes the question and answers from the db.
+
+        """
         try:
             self.messenger.execute(
                 """DELETE FROM quiz_questions WHERE question_id = %s;
