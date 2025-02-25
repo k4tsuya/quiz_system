@@ -52,9 +52,14 @@ class TerminalClient(QuizClient):
             print("6. Add answers to a question")
             print("7. Delete a question")
             print("0. Exit\n")
-            choice: str = input("Enter your choice: ")
 
-            commands[choice]()
+            try:
+                choice: str = input("Enter your choice: ")
+                commands[choice]()
+            except KeyError:
+                print("Invalid option. Please try again.\n")
+                input("Press Enter to continue...")
+                self.clear_terminal()
 
     def start_quiz(self) -> None:
         """Start a new quiz with the selected difficulty level."""

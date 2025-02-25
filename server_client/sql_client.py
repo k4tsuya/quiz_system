@@ -26,11 +26,11 @@ def verify_messenger(function: callable) -> callable:
 class Configuration:
     """PostgreSQL configuration class."""
 
-    host: str
-    port: int
-    user: str
-    password: str
-    dbname: str
+    db_host: str
+    db_port: int
+    db_user: str
+    db_password: str
+    db_name: str
 
 
 class PostgresqlClient:
@@ -59,11 +59,11 @@ class PostgresqlClient:
         """Connect to the PostgreSQL database."""
         try:
             self.db_connection = psycopg2.connect(
-                host=self.config.host,
-                port=self.config.port,
-                user=self.config.user,
-                password=self.config.password,
-                dbname=self.config.dbname,
+                host=self.config.db_host,
+                port=self.config.db_port,
+                user=self.config.db_user,
+                password=self.config.db_password,
+                dbname=self.config.db_name,
             )
             self.messenger = self.db_connection.cursor()
 
